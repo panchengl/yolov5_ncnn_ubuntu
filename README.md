@@ -4,7 +4,7 @@ first stage: get yolov5.bin yolov5.params
 
 second stage : edit anchors in your datasets
 
-third stage: edit ncnn/examples/CMakeLists.txt  : ncnn_add_example(yolov5_resize)
+third stage: edit ncnn/examples/CMakeLists.txt  : ncnn_add_example(yolov5)
 
 fourth stage: make 
 

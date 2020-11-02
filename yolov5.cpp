@@ -38,11 +38,11 @@ typedef struct BoxInfo {
 } BoxInfo;
 
 int input_size = 640;
-int num_class = 5;
+int num_class = 80;
 std::vector<YoloLayerData> layers{
-        {"547",32,{{37,34},{99,35},{83,90}}},
-        {"527",16,{{23,14},{18,28},{58,14}}},
-        {"output",8,{{9,4},{11,11},{26,5}}}, 
+        {"547",32,{{116,90},{156,198},{373,326}}},
+        {"527",16,{{30,61},{62,45},{59,119}}},
+        {"output",8,{{10,13},{16,30},{33,23}}}, 
 };
 
 float fast_exp(float x)

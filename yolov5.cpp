@@ -40,22 +40,9 @@ typedef struct BoxInfo {
 int input_size = 640;
 int num_class = 5;
 std::vector<YoloLayerData> layers{
-        /*{"753",32,{{37,34},{99,35},{83,90}}},
-        {"733",16,{{23,14},{18,28},{58,14}}},
-        {"output",8,{{9,4},{11,11},{26,5}}},*/
-        /*{"547",32,{{37,34},{99,35},{83,90}}},
-        {"733",16,{{23,14},{18,28},{58,14}}},
-        {"output",8,{{9,4},{11,11},{26,5}}}, */
         {"547",32,{{37,34},{99,35},{83,90}}},
         {"527",16,{{23,14},{18,28},{58,14}}},
-        //{"output",8,{{9,4},{11,11},{26,5}}}, 
-	      /*{"444",32,{{37,34},{99,35},{83,90}}},
-        {"424",16,{{23,14},{18,28},{58,14}}},
-        {"output",8,{{9,4},{11,11},{26,5}}},*/
-        //11,7,  30,10,  22,27,  60,20,  41,57,  114,37,  78,112,  237,73,  153,228
-         /*{"444",32,{{78,112},{237,73},{153,228}}},
-        {"424",16,{{60,20},{41,57},{114,37}}},
-        {"output",8,{{11,7},{30,10},{22,27}}},*/
+        {"output",8,{{9,4},{11,11},{26,5}}}, 
 };
 
 float fast_exp(float x)
@@ -105,7 +92,7 @@ std::vector<BoxInfo> decode_infer(ncnn::Mat &data, int stride, const cv::Size &f
                 float *cls_ptr = record + 5;
                 for(int cls = 0; cls<num_classes;cls++){
                     float score = sigmoid(cls_ptr[cls]) * sigmoid(record[4]);
-                    if(score>threshold){
+                    if(score>threshold && score <= 0.9999999){
                         cx = (sigmoid(record[0]) * 2.f - 0.5f + (float)shift_x) * (float) stride;
                         cy = (sigmoid(record[1]) * 2.f - 0.5f + (float)shift_y) * (float) stride;
                         w = pow(sigmoid(record[2]) * 2.f,2)*anchors[i].width;
@@ -118,12 +105,6 @@ std::vector<BoxInfo> decode_infer(ncnn::Mat &data, int stride, const cv::Size &f
                         box.score = score;
                         box.label = cls;
                         result.push_back(box);
-                         /*if(cls==4 || cls == 3)
-                          {
-                            printf("sigmoid(record[4]) is %f\n", sigmoid(record[4]));
-                            printf("cls_ptr[]cls is %f\n", cls_ptr[cls]);
-                            printf("score is %f \n", score);
-                          }*/
                     }
                 }
             }
@@ -173,10 +154,8 @@ static std::vector<BoxInfo>detect_yolov5(cv::Mat& bgr, float threshold, float nm
 {
     ncnn::Net yolov5;
     yolov5.opt.use_vulkan_compute = false;
-    yolov5.load_param("/home/pcl/android_work/ncnn/build/examples/siquan_m.param");
-    yolov5.load_model("/home/pcl/android_work/ncnn/build/examples/siquan_m.bin");
-    //yolov5.load_param("/home/pcl/android_work/ncnn/build/examples/waipo_5x_5class.param");
-    //yolov5.load_model("/home/pcl/android_work/ncnn/build/examples/waipo_5x_5class.bin");
+    yolov5.load_param("/home/pcl/android_work/ncnn/build/examples/yolov5.param");
+    yolov5.load_model("/home/pcl/android_work/ncnn/build/examples/yolov5.bin");
     const int target_size = 640;
 
     float r_w = input_size / (img_w*1.0);
@@ -217,8 +196,7 @@ static std::vector<BoxInfo>detect_yolov5(cv::Mat& bgr, float threshold, float nm
 
 static void draw_objects_v5(const cv::Mat& bgr, const std::vector<BoxInfo> results, std::string img_name)
 {
-    static const char* class_names[] = {"DiaoChe", "TaDiao", "ShiGongJiXie",
-                                        "YanHuo", "DaoXianYiWu", "aeroplane", "bus", "train", "truck",
+    static const char* class_names[] = {"person", "bicycle", "car", "motorcycle", "aeroplane", "bus", "train", "truck",
                                         "boat", "traffic light", "fire hydrant", "stop sign",
                                         "parking meter", "bench", "bird", "cat", "dog", "horse",
                                         "sheep", "cow", "elephant", "bear", "zebra", "giraffe",
@@ -275,8 +253,7 @@ static void draw_objects_v5(const cv::Mat& bgr, const std::vector<BoxInfo> resul
 
 static void write_result_txt(const std::vector<BoxInfo> results, std::string img_name)
 {
-    static const char* class_names[] = {"DiaoChe", "TaDiao", "ShiGongJiXie",
-                                        "YanHuo", "DaoXianYiWu", "aeroplane", "bus", "train", "truck",
+    static const char* class_names[] = {"person", "bicycle", "car", "motorcycle", "airplane", "bus", "aeroplane", "bus", "train", "truck",
                                         "boat", "traffic light", "fire hydrant", "stop sign",
                                         "parking meter", "bench", "bird", "cat", "dog", "horse",
                                         "sheep", "cow", "elephant", "bear", "zebra", "giraffe",
